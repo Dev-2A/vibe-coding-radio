@@ -45,3 +45,11 @@ export interface WeeklyReport {
   moodDistribution: Record<Mood, number>;
   dailyFocusMinutes: number[];    // [Mon, Tue, ..., Sun]
 }
+
+// ===== 음악 관련 =====
+export interface YouTubeVideo {
+  id: string;
+  title: string;
+  channelTitle: string;
+  thumbnail: string;
+}
