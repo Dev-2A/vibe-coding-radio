@@ -11,10 +11,7 @@ interface SessionDraft {
 }
 
 interface SessionState {
-  // 저장된 세션 목록
   sessions: CodingSession[];
-
-  // 현재 진행 중인 세션 (타이머 시작 시 생성)
   activeSession: {
     id: string;
     projectName: string;
@@ -23,11 +20,8 @@ interface SessionState {
     focusMinutes: number;
     completedPomodoros: number;
   } | null;
-
-  // 세션 시작/종료 폼용 임시 데이터
   draft: SessionDraft;
 
-  // 액션
   setDraft: (partial: Partial<SessionDraft>) => void;
   startSession: () => void;
   addPomodoro: (focusMinutes: number) => void;
@@ -125,10 +119,10 @@ export const useSessionStore = create<SessionState>()(
     }),
     {
       name: 'vibe-coding-sessions',
+      skipHydration: true,
       partialize: (state) => ({
         sessions: state.sessions,
         draft: state.draft,
-        // activeSession은 저장 안 함 (새로고침 시 초기화)
       }),
     }
   )

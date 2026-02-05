@@ -31,7 +31,7 @@ export default function SessionFilters({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search projects or notes..."
           className="w-full rounded-lg border border-[#2E2B3F] bg-[#1A1726]
-            pl-0 pr-9 py-2.5 text-sm text-white placeholder:text-[#6B7280]
+            pl-9 pr-9 py-2.5 text-sm text-white placeholder:text-[#6B7280]
             focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500
             transition-colors"
         />

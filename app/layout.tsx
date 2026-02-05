@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/src/components/layout/Header';
 import Sidebar from '@/src/components/layout/Sidebar';
+import StoreHydration from '@/src/components/layout/StoreHydration';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,6 +20,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className="dark">
       <body className={inter.className}>
+        <StoreHydration />
         <Header />
         <Sidebar />
         <main className="pt-14 pl-16 min-h-screen">
