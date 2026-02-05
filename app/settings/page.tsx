@@ -1,8 +1,13 @@
+import TimerSettings from '@/src/components/timer/TimerSettings';
+
 export default function SettingsPage() {
   return (
-    <div>
-      <h2 className="text-xl font-bold text-white mb-2">⚙️ Settings</h2>
-      <p className="text-[#9B97B0]">타이머, Spotify 연동 설정이 여기에 들어갈 거야.</p>
+    <div className="max-w-md">
+      <h2 className="text-xl font-bold text-white mb-6">⚙️ Settings</h2>
+      <div className="space-y-4">
+        <TimerSettings />
+        {/* 이후 단계에서 Spotify 설정, 테마 설정 등 추가 */}
+      </div>
     </div>
   );
 }
