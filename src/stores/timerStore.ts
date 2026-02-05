@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { TimerMode, TimerStatus, TimerConfig } from '../types';
-import { DEFAULT_TIMER_CONFIG } from '../lib/constants';
+import { TimerMode, TimerStatus, TimerConfig } from '@/src/types';
+import { DEFAULT_TIMER_CONFIG } from '@/src/lib/constants';
 
 interface TimerState {
   // 상태
@@ -9,9 +9,10 @@ interface TimerState {
   secondsLeft: number;
   completedPomodoros: number;
   config: TimerConfig;
-
-  // 계산된 값
   totalSeconds: number;
+
+  // 콜백 (세션 연동용)
+  onPomodoroComplete: (() => void) | null;
 
   // 액션
   start: () => void;
@@ -22,6 +23,7 @@ interface TimerState {
   tick: () => void;
   setConfig: (config: Partial<TimerConfig>) => void;
   setMode: (mode: TimerMode) => void;
+  setOnPomodoroComplete: (callback: (() => void) | null) => void;
 }
 
 function getModeSeconds(mode: TimerMode, config: TimerConfig): number {
@@ -39,12 +41,10 @@ function getNextMode(
   longBreakInterval: number
 ): TimerMode {
   if (currentMode === 'focus') {
-    // focus 완료 후: longBreak 간격에 도달하면 longBreak, 아니면 shortBreak
     return (completedPomodoros + 1) % longBreakInterval === 0
       ? 'longBreak'
       : 'shortBreak';
   }
-  // 쉬는 시간 끝나면 다시 focus
   return 'focus';
 }
 
@@ -52,15 +52,14 @@ export const useTimerStore = create<TimerState>((set, get) => {
   const initialSeconds = getModeSeconds('focus', DEFAULT_TIMER_CONFIG);
 
   return {
-    // 초기 상태
     mode: 'focus',
     status: 'idle',
     secondsLeft: initialSeconds,
     completedPomodoros: 0,
     config: DEFAULT_TIMER_CONFIG,
     totalSeconds: initialSeconds,
+    onPomodoroComplete: null,
 
-    // 액션
     start: () => {
       const { mode, config } = get();
       const total = getModeSeconds(mode, config);
@@ -90,7 +89,13 @@ export const useTimerStore = create<TimerState>((set, get) => {
     },
 
     skip: () => {
-      const { mode, completedPomodoros, config } = get();
+      const { mode, completedPomodoros, config, onPomodoroComplete } = get();
+
+      // focus 모드를 스킵하면 뽀모도로 완료로 처리
+      if (mode === 'focus' && onPomodoroComplete) {
+        onPomodoroComplete();
+      }
+
       const nextMode = getNextMode(mode, completedPomodoros, config.longBreakInterval);
       const newCompleted = mode === 'focus' ? completedPomodoros + 1 : completedPomodoros;
       const total = getModeSeconds(nextMode, config);
@@ -105,10 +110,14 @@ export const useTimerStore = create<TimerState>((set, get) => {
     },
 
     tick: () => {
-      const { secondsLeft, mode, completedPomodoros, config } = get();
+      const { secondsLeft, mode, completedPomodoros, config, onPomodoroComplete } = get();
 
       if (secondsLeft <= 1) {
-        // 타이머 종료!
+        // 뽀모도로 완료 콜백 (focus 모드일 때만)
+        if (mode === 'focus' && onPomodoroComplete) {
+          onPomodoroComplete();
+        }
+
         const nextMode = getNextMode(mode, completedPomodoros, config.longBreakInterval);
         const newCompleted = mode === 'focus' ? completedPomodoros + 1 : completedPomodoros;
         const total = getModeSeconds(nextMode, config);
@@ -121,10 +130,10 @@ export const useTimerStore = create<TimerState>((set, get) => {
           completedPomodoros: newCompleted,
         });
 
-        return; // 컴포넌트에서 이걸 감지해서 알림음 재생
+        return;
       }
 
-      set ({ secondsLeft: secondsLeft - 1 });
+      set({ secondsLeft: secondsLeft - 1 });
     },
 
     setConfig: (partial) => {
@@ -147,6 +156,10 @@ export const useTimerStore = create<TimerState>((set, get) => {
         secondsLeft: total,
         totalSeconds: total,
       });
+    },
+
+    setOnPomodoroComplete: (callback) => {
+      set({ onPomodoroComplete: callback });
     },
   };
 });

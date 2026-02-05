@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useTimerStore } from '@/src/stores/timerStore';
+import { useSessionStore } from '@/src/stores/sessionStore';
 import { useSound } from '@/src/hooks/useSound';
 import { formatTime } from '@/src/lib/utils';
 import { TimerMode } from '@/src/types';
@@ -14,21 +15,35 @@ const MODE_LABELS: Record<TimerMode, string> = {
 
 export function useTimer() {
   const store = useTimerStore();
+  const { activeSession, addPomodoro } = useSessionStore();
   const { play } = useSound();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const prevModeRef = useRef<TimerMode>(store.mode);
 
+  // 뽀모도로 완료 시 세션에 기록하는 콜백 등록
+  useEffect(() => {
+    const handlePomodoroComplete = () => {
+      if (activeSession) {
+        addPomodoro(store.config.focus);
+      }
+    };
+
+    store.setOnPomodoroComplete(handlePomodoroComplete);
+
+    return () => {
+      store.setOnPomodoroComplete(null);
+    };
+  }, [activeSession, addPomodoro, store.config.focus, store.setOnPomodoroComplete]);
+
   // 모드가 바뀌면 알림음 재생
   useEffect(() => {
     if (prevModeRef.current !== store.mode && store.status === 'idle') {
-      // 이전 모드가 focus였으면 = focus 끝남
       if (prevModeRef.current === 'focus') {
         play('focusEnd');
       } else {
         play('breakEnd');
       }
 
-      // 브라우저 Notification
       if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
         new Notification('Vibe Coding Radio', {
           body: store.mode === 'focus'
@@ -77,7 +92,6 @@ export function useTimer() {
     }
   }, []);
 
-  // 진행률 (0 ~ 1)
   const progress =
     store.totalSeconds > 0
       ? (store.totalSeconds - store.secondsLeft) / store.totalSeconds
