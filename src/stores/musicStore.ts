@@ -27,7 +27,7 @@ interface MusicState {
   setVolume: (volume: number) => void;
   toggleFavorite: (video: YouTubeVideo) => void;
   isFavorite: (videoId: string) => boolean;
-  addRecentsearch: (query: string) => void;
+  addRecentSearch: (query: string) => void;
   clearQueue: () => void;
 }
 
@@ -103,7 +103,7 @@ export const useMusicStore = create<MusicState>()(
         return get().favorites.some((f) => f.id === videoId);
       },
 
-      addRecentsearch: (query) => {
+      addRecentSearch: (query) => {
         const { recentSearches } = get();
         const trimmed = query.trim();
         if (!trimmed) return;
