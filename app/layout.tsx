@@ -4,6 +4,7 @@ import './globals.css';
 import Header from '@/src/components/layout/Header';
 import Sidebar from '@/src/components/layout/Sidebar';
 import StoreHydration from '@/src/components/layout/StoreHydration';
+import PlayerBar from '@/src/components/music/PlayerBar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,11 +24,12 @@ export default function RootLayout({
         <StoreHydration />
         <Header />
         <Sidebar />
-        <main className="pt-14 pl-16 min-h-screen">
+        <main className="pt-14 pl-16 min-h-screen pb-20">
           <div className="p-6">
             {children}
           </div>
         </main>
+        <PlayerBar />
       </body>
     </html>
   );
