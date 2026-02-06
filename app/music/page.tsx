@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import MusicSearch from '@/src/components/music/MusicSearch';
 import FavoritesList from '@/src/components/music/FavoritesList';
+import QueueList from '@/src/components/music/QueueList';
 
-type Tab = 'search' | 'favorites';
+type Tab = 'search' | 'favorites' | 'queue';
 
 export default function MusicPage() {
   const [tab, setTab] = useState<Tab>('search');
@@ -28,6 +29,14 @@ export default function MusicPage() {
           🔍 Search
         </button>
         <button
+          onClick={() => setTab('queue')}
+          className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all
+            ${tab === 'queue' ? 'bg-[#242136] text-white' : 'text-[#9B97B0] hover:text-white'}
+          `}
+        >
+          📋 Queue
+        </button>
+        <button
           onClick={() => setTab('favorites')}
           className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all
             ${tab === 'favorites' ? 'bg-[#242136] text-white' : 'text-[#9B97B0] hover:text-white'}
@@ -39,6 +48,7 @@ export default function MusicPage() {
 
       {/* 콘텐츠 */}
       {tab === 'search' && <MusicSearch />}
+      {tab === 'queue' && <QueueList />}
       {tab === 'favorites' && <FavoritesList />}
     </div>
   );
