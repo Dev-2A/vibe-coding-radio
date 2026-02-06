@@ -1,11 +1,14 @@
 'use client';
 
 import { useSession } from '@/src/hooks/useSession';
+import { useStreak } from '@/src/hooks/useStreak';
 import Card, { CardTitle } from '@/src/components/ui/Card';
 import { Flame, Clock, Target, FolderGit2 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function TodaySummary() {
   const { todayStats, activeSession, todaySessions } = useSession();
+  const { currentStreak } = useStreak();
 
   // 오늘 가장 많이 작업한 프로젝트
   const topProject = todaySessions.reduce((acc, s) => {
@@ -37,14 +40,22 @@ export default function TodaySummary() {
     },
     {
       icon: <Flame className="h-4 w-4 text-amber-400" />,
-      label: 'Sessions',
-      value: todayStats.sessions.toString(),
+      label: 'Streak',
+      value: currentStreak > 0 ? `${currentStreak}일 🔥` : '-',
     },
   ];
 
   return (
     <Card>
-      <CardTitle>📊 Today</CardTitle>
+      <div className="flex items-center justify-between mb-4">
+        <CardTitle>📊 Today</CardTitle>
+        <Link
+          href="/dashboard"
+          className="text-[10px] text-violet-400 hover:text-violet-300 transition-colors"
+        >
+          View Report →
+        </Link>
+      </div>
 
       {/* 현재 활성 세션 */}
       {activeSession && (

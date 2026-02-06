@@ -7,6 +7,8 @@ import WeeklyBarChart from '@/src/components/dashboard/WeeklyBarChart';
 import MoodDonutChart from '@/src/components/dashboard/MoodDonutChart';
 import LanguageChart from '@/src/components/dashboard/LanguageChart';
 import ProjectList from '@/src/components/dashboard/ProjectList';
+import StreakCard from '@/src/components/dashboard/StreakCard';
+import ActivityHeatmap from '@/src/components/dashboard/ActivityHeatmap';
 import { Target, Clock, Flame, FolderGit2 } from 'lucide-react';
 import { Mood } from '@/src/types';
 
@@ -15,10 +17,10 @@ export default function DashboardPage() {
 
   // 요일별 집중 시간 계산
   const dailyMinutes = useMemo(() => {
-    const result = [0, 0, 0, 0, 0, 0, 0]; // Mon ~ Sun
+    const result = [0, 0, 0, 0, 0, 0, 0];
     weekSessions.forEach((s) => {
       const day = new Date(s.startedAt).getDay();
-      const index = day === 0 ? 6 : day - 1; // 일요일 = 6, 월요일 = 0
+      const index = day === 0 ? 6 : day - 1;
       result[index] += s.focusMinutes;
     });
     return result;
@@ -121,11 +123,19 @@ export default function DashboardPage() {
         <StatCard
           icon={<FolderGit2 className="h-5 w-5" />}
           label="Top Project"
-          value={weekStats.topProject.length > 10 
-            ? weekStats.topProject.slice(0, 10) + '...' 
-            : weekStats.topProject}
+          value={
+            weekStats.topProject.length > 10
+              ? weekStats.topProject.slice(0, 10) + '...'
+              : weekStats.topProject
+          }
           color="emerald"
         />
+      </div>
+
+      {/* 스트릭 + 히트맵 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <StreakCard />
+        <ActivityHeatmap />
       </div>
 
       {/* 차트 그리드 */}
